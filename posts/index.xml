@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on garicchi.github.io</title><link>https://garicchi.github.io/posts/</link><description>Recent content in Posts on garicchi.github.io</description><generator>Hugo -- gohugo.io</generator><language>ja-jp</language><lastBuildDate>Sun, 20 Sep 2020 15:34:34 +0900</lastBuildDate><atom:link href="https://garicchi.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Unity製Androidゲームの解析と改ざん</title><link>https://garicchi.github.io/posts/20200920-unity-android-cheat/</link><pubDate>Sun, 20 Sep 2020 15:34:34 +0900</pubDate><guid>https://garicchi.github.io/posts/20200920-unity-android-cheat/</guid><description>Unityで作ったAndroidゲーム(apk)の基本的な解析、改ざん手法をやってみる
+実験台のゲームプロジェクト apkの解析と改ざんを行うにしても、市販のゲームでやるのはよくないので、簡単なゲームをUnityで作ってみた。
+plumber - github.com
+ローカルサーバーをdocker-composeで起動し、 簡単なタイトル画面とホーム画面、ゲーム画面を持つ。
+タイトル画面では、マスターデータをsqliteとしてダウンロードし、読み込む。
+ホーム画面では、事前にAssetBundleビルドしたpng画像をダウンロードして表示している。
+今回はこのゲームのapkビルドを対象に、解析を行う。
+事前準備 解析、改ざんを行うにしても、実際にアプリが動作しているUSBデバッグ環境を用意したい。
+そこで、今回は楽天miniを使うことにした。
+USBデバッグをオンにし、USBでPCと端末を接続。その後以下のコマンドでapkをインストールする。
+adb install {apkのパス} adbコマンドは、android sdkに付属のものを使う。AndroidStudioをインストールすれば付属でついてくる。
+PlayerPrefs改ざん Unityゲームでは、簡単なデータを保存できる場所として、PlayerPrefsがある。
+PlayerPrefsはstringやintなどの情報を保存できるキーバリューストアで、ユーザーIDなどを保存することが多い。
+このゲームではタイトル画面でログインボタンを押したときに、PlayerPrefsにユーザーIDが無ければユーザーIDを新規作成し、PlayerPrefsに保存、ホーム画面でユーザーIDを表示している。
+今回はこのユーザーIDを書き換えてみる。
+playerprefs.xmlにアクセスしてみる PlayerPrefsの実態は以下のパスにあるxmlファイルだ。
+/data/data/&amp;lt;パッケージ名&amp;gt;/shared_prefs/&amp;lt;パッケージ名&amp;gt;.playerprefs.xml 上記パスのパッケージ名がまだわかっていないので以下のコマンドでパッケージ名を取得しよう。
+$ adb shell pm list packages | grep plumber package:com.garicchi.plumber パッケージ名は com.garicchi.plumber ということがわかった。
+これでxmlのパスにアクセスできるのでアクセスしてみよう。
+$ adb shell C330:/ $ ls /data/data/com.garicchi.plumber/shared_prefs ls: /data/data/com.garicchi.plumber/shared_prefs: Permission denied Permission deniedと言われてしまった。
+playerprefs.xmlがあるパスにアクセスするためには、root権限か、アプリの権限が必要らしい。
+アプリの権限を取得するためには、 run-as コマンドを使用する。
+$ adb shell C330:/ $ run-as com.garicchi.plumber run-as: package not debuggable: com.</description></item></channel></rss>

@@ -1,0 +1,282 @@
+<!doctype html><html lang=ja-jp><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><style type=text/css>body{font-family:monospace}</style><title>Unity製Androidゲームの解析と改ざん</title><link rel=stylesheet href=/css/style.css></head><body><link rel=icon type=image/png sizes=32x32 href=./favicon.ico><style>img{width:100%}</style><style>#share-buttons{display:inline-block;vertical-align:middle}#share-buttons:after{content:"";display:block;clear:both}#share-buttons>div{position:relative;text-align:left;height:36px;width:32px;float:left;text-align:center}#share-buttons>div>svg{height:16px;fill:#d5d5d5;margin-top:10px}#share-buttons>div:hover{cursor:pointer}#share-buttons>div.facebook:hover>svg{fill:#3b5998}#share-buttons>div.twitter:hover>svg{fill:#55acee}#share-buttons>div.linkedin:hover>svg{fill:#0077b5}#share-buttons>div.pinterest:hover>svg{fill:#cb2027}#share-buttons>div.gplus:hover>svg{fill:#dd4b39}#share-buttons>div.mail:hover>svg{fill:#7d7d7d}#share-buttons>div.instagram:hover>svg{fill:#c73b92}#share-buttons>div.facebook>svg{height:18px;margin-top:9px}#share-buttons>div.twitter>svg{height:20px;margin-top:8px}#share-buttons>div.linkedin>svg{height:19px;margin-top:7px}#share-buttons>div.pinterest>svg{height:20px;margin-top:9px}#share-buttons>div.gplus>svg{height:17px;margin-top:9px;position:relative;left:1px}#share-buttons>div.mail>svg{height:14px;margin-top:11px}</style><span style=color:silver>Share on:</span><div id=share-buttons><div class=facebook title="Share this on Facebook" onclick="window.open('http://www.facebook.com/share.php?u=https:\/\/garicchi.github.io\/posts\/20200920-unity-android-cheat\/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1343 12v264h-157q-86 0-116 36t-30 108v189h293l-39 296h-254v759H734V905H479V609h255V391q0-186 104-288.5T1115 0q147 0 228 12z"/></svg></div><div class=twitter title="Share this on Twitter" onclick="window.open('http://twitter.com/home?status=https:\/\/garicchi.github.io\/posts\/20200920-unity-android-cheat\/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1684 408q-67 98-162 167 1 14 1 42 0 130-38 259.5T1369.5 1125 1185 1335.5t-258 146-323 54.5q-271 0-496-145 35 4 78 4 225 0 401-138-105-2-188-64.5T285 1033q33 5 61 5 43 0 85-11-112-23-185.5-111.5T172 710v-4q68 38 146 41-66-44-105-115t-39-154q0-88 44-163 121 149 294.5 238.5T884 653q-8-38-8-74 0-134 94.5-228.5T1199 256q140 0 236 102 109-21 205-78-37 115-142 178 93-10 186-50z"/></svg></div><div class=linkedin title="Share this on Linkedin" onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=https:\/\/garicchi.github.io\/posts\/20200920-unity-android-cheat\/&title=&summary=&source=');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M477 625v991H147V625h330zm21-306q1 73-50.5 122T312 490h-2q-82 0-132-49t-50-122q0-74 51.5-122.5T314 148t133 48.5T498 319zm1166 729v568h-329v-530q0-105-40.5-164.5T1168 862q-63 0-105.5 34.5T999 982q-11 30-11 81v553H659q2-399 2-647t-1-296l-1-48h329v144h-2q20-32 41-56t56.5-52 87-43.5T1285 602q171 0 275 113.5t104 332.5z"/></svg></div><div class=gplus title="Share this on Google Plus" onclick="window.open('https://plus.google.com/share?url=https:\/\/garicchi.github.io\/posts\/20200920-unity-android-cheat\/');"><svg viewBox="0 0 2304 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1437 913q0 208-87 370.5t-248 254-369 91.5q-149 0-285-58t-234-156-156-234T0 896t58-285 156-234 234-156 285-58q286 0 491 192l-199 191Q908 433 733 433q-123 0-227.5 62T340 663.5 279 896t61 232.5T505.5 1297t227.5 62q83 0 152.5-23t114.5-57.5 78.5-78.5 49-83 21.5-74H733V791h692q12 63 12 122zm867-122v210h-209v209h-210v-209h-209V791h209V582h210v209h209z"/></svg></div><div class=mail title="Share this through Email" onclick="window.open('mailto:?&body=https:\/\/garicchi.github.io\/posts\/20200920-unity-android-cheat\/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1792 710v794q0 66-47 113t-113 47H160q-66 0-113-47T0 1504V710q44 49 101 87 362 246 497 345 57 42 92.5 65.5t94.5 48 110 24.5h2q51 0 110-24.5t94.5-48 92.5-65.5q170-123 498-345 57-39 1e2-87zm0-294q0 79-49 151t-122 123q-376 261-468 325-10 7-42.5 30.5t-54 38-52 32.5-57.5 27-50 9h-2q-23 0-50-9t-57.5-27-52-32.5-54-38T639 1015q-91-64-262-182.5T172 690q-62-42-117-115.5T0 438q0-78 41.5-130T160 256h1472q65 0 112.5 47t47.5 113z"/></svg></div></div><main><article><h1>Unity製Androidゲームの解析と改ざん</h1><b><time>2020-09-20 15:34:34</time></b><div><p>Unityで作ったAndroidゲーム(apk)の基本的な解析、改ざん手法をやってみる</p><h2 id=実験台のゲームプロジェクト>実験台のゲームプロジェクト</h2><p>apkの解析と改ざんを行うにしても、市販のゲームでやるのはよくないので、簡単なゲームをUnityで作ってみた。</p><p><a href=https://github.com/garicchi/plumber>plumber - github.com</a></p><p><img src=./img/plumber.gif alt=plumber></p><p>ローカルサーバーをdocker-composeで起動し、
+簡単なタイトル画面とホーム画面、ゲーム画面を持つ。</p><p>タイトル画面では、マスターデータをsqliteとしてダウンロードし、読み込む。</p><p>ホーム画面では、事前にAssetBundleビルドしたpng画像をダウンロードして表示している。</p><p>今回はこのゲームのapkビルドを対象に、解析を行う。</p><h2 id=事前準備>事前準備</h2><p>解析、改ざんを行うにしても、実際にアプリが動作しているUSBデバッグ環境を用意したい。</p><p>そこで、今回は楽天miniを使うことにした。</p><p><img src=./img/rakuten-mini.png alt=mini></p><p>USBデバッグをオンにし、USBでPCと端末を接続。その後以下のコマンドでapkをインストールする。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>adb install <span style=color:#f92672>{</span>apkのパス<span style=color:#f92672>}</span>
+</code></pre></div><p>adbコマンドは、android sdkに付属のものを使う。<a href=https://developer.android.com/studio>AndroidStudio</a>をインストールすれば付属でついてくる。</p><h2 id=playerprefs改ざん>PlayerPrefs改ざん</h2><p>Unityゲームでは、簡単なデータを保存できる場所として、PlayerPrefsがある。</p><p>PlayerPrefsはstringやintなどの情報を保存できるキーバリューストアで、ユーザーIDなどを保存することが多い。</p><p>このゲームではタイトル画面でログインボタンを押したときに、PlayerPrefsにユーザーIDが無ければユーザーIDを新規作成し、PlayerPrefsに保存、ホーム画面でユーザーIDを表示している。</p><p>今回はこのユーザーIDを書き換えてみる。</p><h3 id=playerprefsxmlにアクセスしてみる>playerprefs.xmlにアクセスしてみる</h3><p>PlayerPrefsの実態は以下のパスにあるxmlファイルだ。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>/data/data/&lt;パッケージ名&gt;/shared_prefs/&lt;パッケージ名&gt;.playerprefs.xml
+</code></pre></div><p>上記パスのパッケージ名がまだわかっていないので以下のコマンドでパッケージ名を取得しよう。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb shell pm list packages | grep plumber
+
+package:com.garicchi.plumber
+</code></pre></div><p>パッケージ名は <code>com.garicchi.plumber</code> ということがわかった。</p><p>これでxmlのパスにアクセスできるのでアクセスしてみよう。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb shell
+C330:/ $ ls /data/data/com.garicchi.plumber/shared_prefs
+ls: /data/data/com.garicchi.plumber/shared_prefs: Permission denied
+</code></pre></div><p>Permission deniedと言われてしまった。</p><p>playerprefs.xmlがあるパスにアクセスするためには、root権限か、アプリの権限が必要らしい。</p><p>アプリの権限を取得するためには、 <code>run-as</code> コマンドを使用する。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb shell
+C330:/ $ run-as com.garicchi.plumber
+run-as: package not debuggable: com.garicchi.plumber
+</code></pre></div><p><code>run-as</code> コマンドを使用しようとしたら、 <code>package not debuggable</code> と言われてしまった。</p><p>どうやら、アプリの権限を得るためには、debuggableなapkでないとダメらしい。</p><p>つまり、以下のロジックになる。</p><pre><code>playerprefs.xmlを書き換えたい → アプリの権限が必要 → apkをdeuggableにする必要
+</code></pre><p>apkをdebuggableにする方法探ろう。</p><h3 id=apkをdebuggableにする>apkをdebuggableにする</h3><p>apkをdebggableにするには、以下の方法をとる必要がある</p><ul><li>apkをPCに転送する</li><li>apkの中身を展開する</li><li>AndroidManifest.xmlのdebuggableをtrueに書き換える</li><li>apkを再構築する</li><li>apkに再署名する</li><li>apkを端末に転送する</li></ul><p>順にやっていこう。</p><p>まずは、apkのフルパスを <code>pm list packages</code> コマンドで取得する。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb shell pm list packages -f | grep plumber
+package:/data/app/com.garicchi.plumber-UDmxSP9VmrdM1Y_vSrKQkA<span style=color:#f92672>==</span>/base.apk<span style=color:#f92672>=</span>com.garicchi.plumber
+</code></pre></div><p><code>/data/app/com.garicchi.plumber-UDmxSP9VmrdM1Y_vSrKQkA==/base.apk=com.garicchi.plumber</code> がこのapkのフルパスだった。</p><p>これをadb pullしてPCに転送する。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb pull /data/app/com.garicchi.plumber-UDmxSP9VmrdM1Y_vSrKQkA<span style=color:#f92672>==</span>/base.apk
+/data/app/com.garicchi.plumber-UDmxSP9VmrdM1Y_vSrKQkA<span style=color:#f92672>==</span>/base.apk: <span style=color:#ae81ff>1</span> file pulled. 26.6 MB/s <span style=color:#f92672>(</span><span style=color:#ae81ff>18056211</span> bytes in 0.647s<span style=color:#f92672>)</span>
+</code></pre></div><p>apkの転送に成功した。</p><p>次にこのapkの中にあるAndroidManifest.xmlを書き換えたい。</p><p>apkファイルは実質zipファイルなのでzip展開してもよいが、今回は再度apkに戻したいので、<a href=https://ibotpeaches.github.io/Apktool/>apktool</a>というものを使う。</p><p>apktoolをダウンロードし、以下のコマンドでapkを展開する。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ java -jar apktool.jar decode base.apk
+</code></pre></div><p>baseというフォルダにapkが展開された。</p><pre><code>base
+|-- AndroidManifest.xml
+|-- apktool.yml
+|-- assets
+|   `-- bin
+|-- lib
+|   `-- armeabi-v7a
+|-- original
+|   |-- AndroidManifest.xml
+|   `-- META-INF
+|-- res
+|   |-- mipmap-anydpi-v26
+|   |-- mipmap-mdpi
+|   |-- values
+|   |-- values-v21
+|   `-- values-v28
+`-- smali
+   |-- bitter
+   |-- com
+   `-- org
+</code></pre><p>展開したフォルダの中にAndroidManifest.xmlがあるので、これのapplicationタグの属性にandroid:debuggable=”true”を追加する。</p><p><img src=./img/debuggable.png alt=debuggable></p><p>AndroidManifest.xmlの書き換えが終わったら、以下のコマンドで再びapkに戻す。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ java -jar apktool.jar build -f base/
+</code></pre></div><p>これでbase/dist/base.apkにdebuggableなapkが完成した。</p><p>これを実機に再度転送するが、Androidは未署名なapkをインストールすることができない。
+apktoolで作ったapkは署名情報が消えてしまっているので、再署名が必要となる。</p><p>再署名するためにはkeystoreが必要なのでkeystoreを作成する。</p><p>keystoreを作るためには、jdk付属のkeytoolを使う。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ export PATH<span style=color:#f92672>=</span>$PATH:<span style=color:#e6db74>&#39;/c/Program Files/Java/jdk1.8.0_201/bin/&#39;</span>
+$ keytool -genkeypair -keystore test-keystore
+<span style=color:#75715e># パスワードは覚えていればなんでもいい</span>
+<span style=color:#75715e># いろいろ聞かれるけど最後の質問にyesと答えるだけでよい</span>
+</code></pre></div><p>test-keystoreを作成できたのでこれを使ってapkを再署名する。
+apkに署名を行うには、JDK付属のjarsignerを使う。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ jarsigner -keystore test-keystore base/dist/base.apk mykey
+キーストアのパスワードを入力してください:
+jarは署名されました。
+</code></pre></div><p>これでインストール可能なapkすることができた。</p><p>次に再構築したdebuggableなapkを端末にインストールする。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#75715e># 同じパッケージ名のapkいインストールできないので先にuninstallしておく</span>
+$ adb uninstall com.garicchi.plumber
+Success
+
+$ adb install base/dist/base.apk
+Performing Streamed Install
+Success
+</code></pre></div><h3 id=再度playerprefxmlを取得してみる>再度playerpref.xmlを取得してみる</h3><p>apkがdebuggableになったので <code>run-as</code> でアプリの権限を取得することができるようになり、playerprefs.xmlを見ることができるようになる。</p><p>一応playerprefsに初期値を入れるため、アプリを起動しておこう。</p><p>以下のコマンドでアプリの権限を取得する</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb shell
+C330:/ $ run-as com.garicchi.plumber
+</code></pre></div><p>今度はapkがdebuggableなので、アプリの権限を取得することができた。</p><p>続いて以下のコマンドでplayprefs.xmlを <code>/sdcard</code> にコピーする。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>C330:/data/data/com.garicchi.plumber $ ls shared_prefs/
+com.garicchi.plumber.v2.playerprefs.xml
+
+cp shared_prefs/com.garicchi.plumber.v2.playerprefs.xml /sdcard/temp.xml
+exit
+exit
+</code></pre></div><p><code>/sd-card</code> にコピーしたファイルをadb pullでPCに転送する。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb pull /sdcard/temp.xml
+</code></pre></div><p>temp.xmlを開いてみると、PlayerPrefsがxmlとして保存されているのがわかる。</p><p><img src=./img/playerprefs.png alt=playerprefs></p><h3 id=playerprefsを改ざんする>PlayerPrefsを改ざんする</h3><p>今回のゲームでは、playerprefs.xmlにあるUSER_IDというキーがユーザーIDのようなので好きな値に書き換えてみる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>&lt;string name<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;USER_ID&#34;</span>&gt;hacked!&lt;/string&gt;
+</code></pre></div><p>書き換えることができたら、再度端末に戻す。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb push temp.xml /sdcard/
+temp.xml: <span style=color:#ae81ff>1</span> file pushed. 0.0 MB/s <span style=color:#f92672>(</span><span style=color:#ae81ff>644</span> bytes in 0.085s<span style=color:#f92672>)</span>
+</code></pre></div><p>アプリの権限を取得して、アプリのディレクトリにコピーする。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb shell
+C330:/ $ run-as com.garicchi.plumber
+
+cp /sdcard/temp.xml shared_prefs/com.garicchi.plumber.v2.playerprefs.xml
+</code></pre></div><p>ゲームを再起動すると、USER IDが書き変わっていることが確認できる。(右上に改ざんした文字が表示されている)</p><p><img src=./img/rewrite-userid.png alt=rewrite-userid></p><p>PlayerPrefsは簡易セーブデータとして便利ではあるが、このように簡単に書き換えることができてしまうので、重要なデータはPlayerPrefsに保存しないようにしたほうがよい。</p><h2 id=クライアントマスターデータ改ざん>クライアントマスターデータ改ざん</h2><p>先ほどのPlayerPrefsではユーザーIDを書き換えたが、実際にゲームが有利になったりはしなかった。
+次はクライアントに保存されているマスターデータを改ざんし、ゲームを有利に進めてみる。</p><h3 id=クライアントマスターデータの取得>クライアントマスターデータの取得</h3><p>多くのゲームでは、ゲームを制御するデータをマスターデータとしてSQLiteで用意する。
+そしてSQLiteをダウンロードしておき、そのSQLiteに書かれたデータを元に、ゲームを構築する。</p><p>今回のゲームでも、タイトル画面でログインをした時、マスターデータSQLiteとして端末にダウンロードしている。
+<img src=./img/master-dl.png alt=master-dl></p><p>Unityでは、アプリの永続的なファイル保存先として、 <code>Application.persistentDataPath</code> というAPIを用意している。
+このAPIを使うと、各OSに合わせたファイル保存先を提供してくれる。</p><p>Androidの場合、 <code>/storage/emulated/0/Android/data/&lt;パッケージ名>/files</code> が保存先として提供される。</p><p>今回のアプリでも、<code>Application.persistentDataPath</code> を使ってSQLiteを保存したのでSQLiteを取得してみる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb pull /storage/emulated/0/Android/data/com.garicchi.plumber/files/masterdata.db
+/storage/emulated/0/Android/data/com.garicchi.plumber/file...erdata.db: <span style=color:#ae81ff>1</span> file pulled. 0.6 MB/s <span style=color:#f92672>(</span><span style=color:#ae81ff>16384</span> bytes in 0.025s<span style=color:#f92672>)</span>
+</code></pre></div><h3 id=sqliteを書き換える>SQLiteを書き換える</h3><p>SQLiteファイルを取得できたので開いてみる。</p><p>|<img src=./img/master-schema.png alt=master-schema>|<img src=./img/master-value.png alt=master-value>|</p><p>init_game_time_secというキーはゲームの制限時間っぽく、
+score_point_attackというキーはゲームのアタック時の加算されるスコアっぽい。</p><p>これを有利になるように書き換えてみる。</p><p>今回はゲームの制限時間を3秒→20秒に書き換え、加算スコアを10→1000にしてみた。</p><p><img src=./img/master-rewrite.png alt=master-rewrite></p><h3 id=クライアントマスターデータの再転送>クライアントマスターデータの再転送</h3><p>SQLiteを書き換えたら　adb pushで転送しなおす。
+この時、ゲームはホーム画面にいる状態で転送してください。タイトル画面にいると、ボタンを押した後に正しいマスターデータをダウンロードしなおしてしまいます。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>adb push masterdata.db /storage/emulated/0/Android/data/com.garicchi.plumber/files/
+</code></pre></div><p>ゲーム画面に行くと、制限時間が20秒から始まり、ATTACKボタンを押すたびに1000スコア加算されるようになった。</p><p><img src=./img/master-rewrite-game.png alt=master-rewrite-game></p><p>このように、一度端末に保存してしまったファイルは、非常に簡単に書き換えることができる。</p><p>ゲームのマスターデータを簡単に改ざんされてしまっては、簡単にチートができてしまうので、マスターデータは特に改ざんしにくくする必要がある。</p><p>代表的な例としては<a href=https://www.zetetic.net/sqlcipher/>SQLCipher</a>などをつかって、SQLiteを暗号化するなどがある。</p><p>この時、復号化キーは都度サーバーから取得するようにして、クライアントには保存しないように気をつける。</p><p>クライアントに保存したり、バイナリに埋め込んだ場合、キーを解析されてしまう恐れがある。</p><h2 id=アセット抽出>アセット抽出</h2><p>ゲームには画像や音楽など、様々なアセットを使用する。</p><p>Unityの場合、基本的にはアセットをAssetBundleという形式に変換し、S3などから追加ダウンロードという形で取得する。</p><p>ダウンロードされたAssetBundleの中身はアセットなので、攻撃者はアセットを解析することができる。</p><p>アセットを解析されたり、改ざんされたとしてもゲームを有利に進めることは難しいが、アセットから未来の施策のネタバレさされる可能性がある。</p><p>例えば、次のゲームイベントに使う画像を、イベントが始まる前にユーザーがダウンロードしてしまうと、アセットを解析され、次のイベントが始まる前にイベントの内容をネタバレされてしまう。</p><p>今回は、AssetBundleとして追加ダウンロードされた、png画像を解析してみる。</p><h3 id=assetbundleを抽出する>AssetBundleを抽出する</h3><p>AssetBundleもマスターデータと同じようにApplication.persistendDataPathに保存されていると仮定して、探してみる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb shell ls /storage/emulated/0/Android/data/com.garicchi.plumber/files/
+assetbundles
+masterdata.db
+</code></pre></div><p>assetbundlesというそれっぽいフォルダがあった。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb shell
+C330:/ $ cd /storage/emulated/0/Android/data/com.garicchi.plumber/files/
+
+C330:/ $ find assetbundles
+assetbundles/
+assetbundles/Android
+assetbundles/Android/asset01.dep
+assetbundles/Android/asset01material.dep
+assetbundles/Android/asset01prefab
+assetbundles/Android/asset01prefab.dep
+assetbundles/Android/asset01
+assetbundles/Android/asset01material
+assetbundles/Windows
+assetbundles/Windows/asset01material
+assetbundles/Windows/asset01material.dep
+assetbundles/Windows/asset01prefab
+assetbundles/Windows/asset01
+assetbundles/Windows/asset01prefab.dep
+assetbundles/Windows/asset01.dep
+</code></pre></div><p>今回は <code>assetbundles/Android/asset01</code> というABを抽出してみる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ adb pull /storage/emulated/0/Android/data/com.garicchi.plumber/files/assetbundles/Android/asset01
+/storage/emulated/0/Android/data/com.garicchi.plumber/file...id/asset01: <span style=color:#ae81ff>1</span> file pulled. 0.3 MB/s <span style=color:#f92672>(</span><span style=color:#ae81ff>2307</span> bytes in 0.007s<span style=color:#f92672>)</span>
+</code></pre></div><p>AssetBudleを取得することができた。</p><h3 id=assetbundleから画像を抽出する>AssetBundleから画像を抽出する</h3><p>adb pullしたファイルは、AssetBundle形式なので、素材を抽出することができる。</p><p>AssetBundleからアセットを抽出するにはいろいろなツールがあるが、<a href=https://github.com/Perfare/AssetStudio>AssetStudio</a>というツールが便利だった。</p><p>AssetStudioをつかって、asset01ファイルを開くと、これはTexure2Dであることがわかり、アセットも表示された。</p><p><img src=./img/extract-ab.png alt=extract-ab></p><p>もちろんpngとして抽出することもできる。</p><p>このように、一度ダウンロードしてしまったアセットは非常に簡単に解析されてしまう。</p><p>未来の施策をネタバレされないためには、施策が始まる直前までアセットをダウンロードしないように制御することが重要である。</p><h2 id=mono-scripting-backendの改ざん>mono scripting backendの改ざん</h2><p>Unityのバイナリビルドでは、
+ビルド時は.NetのILという中間言語までコンパイルし、実行時に機械語にコンパイルされる mono scripting backendと
+ビルド時にILをC++に変換したのち、対象のアーキテクチャの機械語コードに一気にコンパイルするIL2CPP scripting backend
+の2種類の方式を選択できる。</p><p>今回はmonoでアプリを作った場合、いかに簡単に解析できるかを試してみる。</p><h3 id=ilを逆コンパイルする>ILを逆コンパイルする</h3><p>PlayerPrefs改ざんで実践したのと同じようにapkをadb pullし、apktoolで展開する。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#75715e># apkのパスを取得</span>
+$ adb shell pm list packages -f | grep plumber
+package:/data/app/com.garicchi.plumber-KJYyK3FA7jih38wcAiIHtg<span style=color:#f92672>==</span>/base.apk<span style=color:#f92672>=</span>com.garicchi.plumber
+<span style=color:#75715e># apkをpull</span>
+$ adb pull /data/app/com.garicchi.plumber-KJYyK3FA7jih38wcAiIHtg<span style=color:#f92672>==</span>/base.apk
+/data/app/com.garicchi.plumber-KJYyK3FA7jih38wcAiIHtg<span style=color:#f92672>==</span>/base.apk: <span style=color:#ae81ff>1</span> file pulled. 22.0 MB/s <span style=color:#f92672>(</span><span style=color:#ae81ff>18056260</span> bytes in 0.784s<span style=color:#f92672>)</span>
+<span style=color:#75715e># apk展開</span>
+$ java -jar apktool.jar decode base.apk
+</code></pre></div><p>展開したapkのassets/bin/data/Managedフォルダの中を見ると、dllがいくつかある。</p><p>この中のAssembly-CSharp.dllにUnityで開発者が書いたC# ScriptがILに変換されたものが入っている。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>base
+|-- AndroidManifest.xml
+|-- apktool.yml
+|-- assets
+|   <span style=color:#e6db74>`</span>-- bin
+|       <span style=color:#e6db74>`</span>-- Data
+|           |-- Managed
+|           |   |-- Assembly-CSharp.dll  <span style=color:#75715e># UnityゲームのコードのILが入っているdll</span>
+|           |   |-- Mono.Security.dll
+|           |   |-- System.Buffers.dll
+|           |   |-- System.ComponentModel.Composition.dll
+</code></pre></div><p>Assembly-CSharp.dllを解析し、中にあるILをC#のコードに逆コンパイルすればコンパイル前のコードを復元できる。
+ILの逆コンパラとしては、<a href=https://github.com/icsharpcode/ILSpy>ILSpy</a>などがあるが、今回はReflexilというプラグインを入れることによってILを書き換えることができる<a href=https://www.telerik.com/products/decompiler.aspx>JustDecompile</a>を使う。</p><p>JustDecompileでAssembly-CSharp.dllを開いてみる。</p><p>かなり元のC#コードに近い形で復元することができた。</p><p>.NetのILは変数名や関数名などのシンボル情報を一緒に持っているため、gccなどでネイティブコンパイルされたコードを復元する場合と比べ、非常に解析しやすく、元コードを復元しやすい。</p><p><img src=./img/justdecompile.png alt=justdecompile></p><h3 id=ilを書き換える>ILを書き換える</h3><p>次にILを改ざんしてみる。
+JustDecompileのPlugins Managerを開き、Assembly Editorをインストールする。</p><p><img src=./img/reflexil.png alt=reflexil></p><p>今回はGameSceneControllerクラスのUpdateメソッドを書き換えます。</p><p>Updateメソッドはこのようになっており、主にゲームの残り時間を制御している。</p><p>残り時間が0以下の場合、ゲームの状態をFinishにするような制御をしている。
+この「残り時間が0以下になったらゲームの状態をFinishにするという処理」をしている
+<code>state = GameState.Finish;</code>
+の部分を
+<code>state = GameState.Playing;</code>
+に改ざんすることができれば、
+「残り時間が0以下になったらゲームの状態をPlayingにするという処理」
+に変えることができ、ゲームが終わらずに無限にゲームを遊べるチートができる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-cs data-lang=cs><span style=color:#66d9ef>void</span> Update()
+{
+    <span style=color:#66d9ef>if</span> (state == GameState.Playing)  <span style=color:#960050;background-color:#1e0010>#</span> Playing状態なら
+    {
+        remain -= Time.deltaTime;    <span style=color:#960050;background-color:#1e0010>#</span> <span style=color:#960050;background-color:#1e0010>残り時間を減らす</span>
+        <span style=color:#66d9ef>if</span> (remain &lt;= <span style=color:#ae81ff>0</span>)             <span style=color:#960050;background-color:#1e0010>#</span> <span style=color:#960050;background-color:#1e0010>残り時間が</span><span style=color:#ae81ff>0</span><span style=color:#960050;background-color:#1e0010>以下なら</span>
+        {
+            state = GameState.Finish;  <span style=color:#960050;background-color:#1e0010>#</span> Finish状態にしてゲーム終了
+        }
+        TextTime.text = Math.Round(remain, <span style=color:#ae81ff>1</span>).ToString();  <span style=color:#960050;background-color:#1e0010>#</span> <span style=color:#960050;background-color:#1e0010>テキスト表示処理</span>
+        TextScore.text = score.ToString();  <span style=color:#960050;background-color:#1e0010>#</span> <span style=color:#960050;background-color:#1e0010>テキスト表示処理</span>
+    }
+}
+</code></pre></div><p>ILを改ざんするためにはJustDecompileで、PluginsからReflexilを開く。</p><p>そして、左側のツリーからGameSceneControllerのUpdateメソッドをクリックする。
+すると、上にC#コード、下にILコードが表示される。</p><p><img src=./img/decompile-il.png alt=decompile-il></p><p>次に、書き換えたい<code>state = GameState.Finish;</code> のコードがILのどの命令かに大体当たりをつける。
+<code>state = GameState.Finish;</code>はC#上では
+<code>remain -= Time.deltaTime</code> と <code>Text textTime = this.TextTime;</code>
+に挟まれている。</p><p>それを参考にILを追ってみると、remainやdeltaTime()とTextTimeに挟まれている<code>GameSceneController::state</code> があることがわかる。</p><p>該当のILは以下のようになっている。</p><pre><code>stfld GameSceneController::state
+</code></pre><p><a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.stfld?view=netcore-3.1">stfld命令</a>についてググってみると、「Replaces the value stored in the field of an object reference or pointer with a new value.」とあるので、どうやら代入命令のようだ。</p><p>では何を代入しているかというと、ILも他のアセンブリ言語と同じように演算に使うパラメータは事前にスタックにいれておいて、演算を行う。
+ので代入命令で代入する値は、代入命令よりも前で、スタックに積んでいるはず。</p><p>stfldの1つ前の命令を見てみましょう。</p><pre><code>ldc.i4.1
+</code></pre><p><a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.ldc_i4_1?view=netcore-3.1">ldc.i4.1命令</a>についてググってみると「Pushes the integer value of 1 onto the evaluation stack as an int32.」とあるので、stfld命令で代入する値をスタックにpushしていると考えられる。</p><p>C#上ではstateに代入しているのはGameState::Finishであり、これはintに変換すると1なので、書き換えるべきゲームの状態を制御している命令はここと考えられる。</p><p>そしてldc.i4.1命令をldc.i4.0命令に書き換えれば、stateに0 (GameState::Playing)が代入され、ゲームを終了することなく無限に遊べそう。</p><p>ではldc.i4.1命令を右クリックしてEditしてみよう。</p><p><img src=./img/edit-il-2.png alt=edit-il-2>
+<img src=./img/edit-il.png alt=edit-il></p><p>これでILの書き換えが完了したので左のツリーからAssembly-CSharp > Reflexil > Save as.. を押してdllを保存する。</p><p><img src=./img/save-il.png alt=save-il></p><p>名前はAssembly-CSharp.dllとし、既存のファイルを上書きする。</p><p>JustDecompileで再度AssemblyCSharp.dllを開くと、意図通り
+this.state = GameSceneController.GameState.Playing;
+に書き変わっていることがわかる。</p><p><img src=./img/rewrite-update.png alt=rewrite-update></p><p>最後に、書き換えたdllを再度apkにし、実機にインストール、プレイしてみる。
+手順はPlayerPrefs改ざんの時と同じ。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#75715e># apk再構築</span>
+$ java -jar apktool.jar build -f base/
+<span style=color:#75715e># 再署名</span>
+$ jarsigner -keystore test-keystore base/dist/base.apk mykey
+<span style=color:#75715e># アンインストール</span>
+$ adb uninstall com.garicchi.plumber
+<span style=color:#75715e># インストール</span>
+$ adb install base/dist/base.apk
+</code></pre></div><p>では実際に実機で遊んでみる。</p><p><img src=./img/play-rewrite-il.gif alt=play-rerite-il></p><p>制限時間が0になってもゲームが終了しないので無限にスコアを稼げるようになった。</p><p>このようにscripting backendをmonoにしてアプリを作った場合、非常に解析しやすく、バイナリ改ざんが容易にできてしまう。</p><h2 id=il2cpp-scripting-backendの静的解析と改ざん>IL2CPP scripting backendの静的解析と改ざん</h2><p>先ほどの手順で、mono scripting backendは簡単に書き換えることができてしまった。
+ではscripting backendをIL2CPPにすればセキュリティ的に安全かといえばそんなことはないと思われる。
+解析対象が中間言語ではなく機械語となるので、多少解析はしにくくはなりますが、改ざんが可能である。</p><h3 id=il2cppによるビルド>IL2CPPによるビルド</h3><p>IL2CPPをするにはUnityのPlayerSettingsのScriptingBackendでIL2CPPを選択し、TargetArchitecturesは 32bit ARMであるARMv7を選択する。</p><p><img src=./img/il2cpp-set.png alt=il2cpp-set></p><p>これでビルドしたapkをadb installし、adb pull、apktoolで展開する。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#75715e># apk install</span>
+$ adb install plumber.apk
+Performing Streamed Install
+Success
+
+<span style=color:#75715e># apk パスの特定</span>
+$ adb shell pm list packages -f | grep plumber
+package:/data/app/com.garicchi.plumber-CAcic8MiZ1yJqfTJu8j-BA<span style=color:#f92672>==</span>/base.apk<span style=color:#f92672>=</span>com.garicchi.plumber
+
+<span style=color:#75715e># apkをpullする</span>
+$ adb pull /data/app/com.garicchi.plumber-CAcic8MiZ1yJqfTJu8j-BA<span style=color:#f92672>==</span>/base.apk
+
+<span style=color:#75715e># apk展開</span>
+$ java -jar apktool.jar decode -f base.apk
+</code></pre></div><p>IL2CPPでビルドされたapkを展開してみると、以下のようなファイル構成になっている。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>base
+|-- AndroidManifest.xml
+|-- apktool.yml
+|-- assets
+|   <span style=color:#e6db74>`</span>-- bin
+|       <span style=color:#e6db74>`</span>-- Data
+|           |-- Managed
+|           |   |-- Metadata
+|           |   |   <span style=color:#e6db74>`</span>-- global-metadata.dat  <span style=color:#75715e># 開発者が書いたゲームコードのシンボル情報など</span>
+|           |   |-- Resources
+|           |   |   <span style=color:#e6db74>`</span>-- mscorlib.dll-resources.dat
+|           |   <span style=color:#e6db74>`</span>-- etc
+|           |       <span style=color:#e6db74>`</span>-- mono
+|           |-- boot.config
+|           |-- data.unity3d
+|           <span style=color:#e6db74>`</span>-- unity default resources
+|-- lib
+|   <span style=color:#e6db74>`</span>-- armeabi-v7a
+|       |-- libil2cpp.so  <span style=color:#75715e># 開発者が書いたゲームコードの機械語コード</span>
+|       |-- libmain.so
+|       |-- libsqlite3.so
+</code></pre></div><p><code>lib/armeabi-v7a</code>のパスにある<code>libil2cpp.so</code>ファイルが開発者が書いたC#ゲームコードが機械語にコンパイルされたものである。
+しかしながらIL2CPPのコンパイルはmono(IL)と違い、関数名や変数名などのシンボル情報は実行に必要な情報ではないので削除されている。</p><p>IL2CPPの静的解析の目的としては、このlibil2cpp.soの機械語コードを逆コンパイルして処理内容を把握することだが、変数名や関数名がわからないと、解析が大変になる。</p><p>IL2CPPでビルドされたapkは<code>assets/bin/Data/Managed/Metada</code>にある<code>global-metadata.dat</code>に関数名や変数名のシンボル情報が保存されているのでこの情報を利用すれば解析が楽になる。</p><p>とはいえ、global-metadata.dat自体も解析しなければいけないのでツールを使ってみる。
+<a href=https://github.com/Perfare/il2CppDumper>il2CppDumper</a>というツールを使うと、<code>global-metadata.dat</code>と<code>libil2cpp.so</code>を入力として、機械語のどの命令がどの関数や変数に対応しているのかを出力してくれます。</p><p>実際にシンボルをダンプしてみる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ mkdir dump
+$ ./Il2CppDumper.exe base/lib/armeabi-v7a/libil2cpp.so base/assets/bin/Data/Managed/Metadata/global-metadata.dat dump
+</code></pre></div><p>ダンプされた中身はこんな感じ。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>dump
+|-- DummyDll
+|   |-- Assembly-CSharp.dll
+|-- dump.cs
+|-- il2cpp.h
+|-- script.json
+<span style=color:#e6db74>`</span>-- stringliteral.json
+</code></pre></div><p>この中にある<code>script.json</code>を逆アセンブラで読み込むと、アセンブリ命令にシンボル情報をマップできる。</p><h3 id=逆コンパイラで読み込む>逆コンパイラで読み込む</h3><p>逆アセンブラとしては<a href=https://www.hex-rays.com/products/idahome/>IDA</a>が有名だが、こちらはARMの逆アセンブルをしようと思うと課金(4万円)が必要なので、無料で使える<a href=https://ghidra-sre.org/>Ghidra</a>という逆アセンブラを使う。</p><p>Ghidraを開いたらNew Projectでプロジェクトを作り、Import Fileでlibil2cpp.soを開く。</p><p>初回解析時には、analyzeするか聞いてくるが、analyzeしておく。5分ぐらいかかる。</p><p><img src=./img/import-ghidra.png alt=import-ghidra></p><p><img src=./img/select-ghidra.png alt=select-ghidra></p><p>解析が完了したらざっとアセンブリコードを見てみる。
+機械語よりはわかりやすいが、ここからC#のコードを推測するのは結構困難。</p><p><img src=./img/ghidra-cpp.png alt=ghidra-cpp></p><p>そこで先ほどIl2CppDumperでダンプしたjsonを食わせる。</p><p>まずは<code>script.json</code>を食わせるためのGhidra用Pythonスクリプトを、Ghidraが認識できる位置に配置する
+Il2CppDumperに付属している<code>ghidra.py</code>を<code>~/ghidra_scripts</code>に配置します。</p><p>ScriptManagerを開き、配置した<code>ghidra.py</code>をダブルクリックし、実行する。</p><p><img src=./img/ghidra-scriptmanager.png alt></p><p><img src=./img/ghidra-py.png alt></p><p><img src=./img/ghidra-script.png alt></p><p>シンボルが読み込まれ、どのラベルがどの関数かがおおよそわかるようになった。</p><p><img src=./img/ghidra-symbol.png alt></p><h3 id=il2cppバイナリの改ざん>IL2CPPバイナリの改ざん</h3><p>今回も改ざん対象はmono scripting backendの静的解析と改ざんと同じ、GameSceneControllerクラスのUpdate関数とする。</p><p>Ghidraの<code>Search Program Text</code>を起動し、<code>GameSceneController</code>と入力する。Fieldsは<code>Functions</code>にチェックを入れ、<code>Search All</code> をクリックする。</p><p><img src=./img/ghidra-search.png alt></p><p>検索結果によると、GameSceneControllerのUpdateメソッドは<code>0079d4fc番地</code>にあることがわかる。
+ダブルクリックしてジャンプしてみる。</p><p><img src=./img/ghidra-update.png alt></p><p>GameSceneControllerのUpdateメソッドに飛ぶことができた。右側の逆コンパイルされたC++コードを見てもそれっぽいことがわかる。</p><p><img src=./img/ghidra-decompile-cpp.png alt></p><p>mono scripting backendの静的解析と改ざんの時と同じように、<code>state = GameState.Finish;</code>を探す。</p><p>元コードは以下のような感じなので、<code>deltaTime</code>と<code>Math.Round</code>に挟まれている処理を探す。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-cs data-lang=cs><span style=color:#66d9ef>void</span> Update()
+{
+    <span style=color:#66d9ef>if</span> (state == GameState.Playing)  <span style=color:#960050;background-color:#1e0010>#</span> Playing状態なら
+    {
+        remain -= Time.deltaTime;    <span style=color:#960050;background-color:#1e0010>#</span> <span style=color:#960050;background-color:#1e0010>残り時間を減らす</span>
+        <span style=color:#66d9ef>if</span> (remain &lt;= <span style=color:#ae81ff>0</span>)             <span style=color:#960050;background-color:#1e0010>#</span> <span style=color:#960050;background-color:#1e0010>残り時間が</span><span style=color:#ae81ff>0</span><span style=color:#960050;background-color:#1e0010>以下なら</span>
+        {
+            state = GameState.Finish;  <span style=color:#960050;background-color:#1e0010>#</span> Finish状態にしてゲーム終了
+        }
+        TextTime.text = Math.Round(remain, <span style=color:#ae81ff>1</span>).ToString();  <span style=color:#960050;background-color:#1e0010>#</span> <span style=color:#960050;background-color:#1e0010>テキスト表示処理</span>
+        TextScore.text = score.ToString();  <span style=color:#960050;background-color:#1e0010>#</span> <span style=color:#960050;background-color:#1e0010>テキスト表示処理</span>
+    }
+}
+</code></pre></div><p>Time.deltaTimeとMath.Roundに挟まれている処置を以下に示す。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-s data-lang=s>;; Time.deltaTimeの呼び出し
+<span style=color:#ae81ff>0079</span>d55c <span style=color:#ae81ff>34</span> <span style=color:#ae81ff>76</span> fb eb 	bl     	UnityEngine.Time<span style=color:#f92672>$$</span>get_deltaTime
+<span style=color:#ae81ff>0079</span>d560 <span style=color:#ae81ff>10</span> <span style=color:#ae81ff>0</span>a <span style=color:#ae81ff>00</span> ee 	vmov   	s0,r0
+;; remain <span style=color:#f92672>-=</span> Time.deltaの減算処理っぽい
+<span style=color:#ae81ff>0079</span>d564 <span style=color:#ae81ff>40</span> <span style=color:#ae81ff>8</span>a <span style=color:#ae81ff>38</span> ee 	vsub.f32   s16,s0
+;; <span style=color:#a6e22e>if </span>(remain <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>0</span>)の分岐命令っぽい
+<span style=color:#ae81ff>0079</span>d568 c0 <span style=color:#ae81ff>8</span>a b5 ee 	vcmpe.f32  s16,<span style=color:#75715e>#0</span>
+<span style=color:#ae81ff>0079</span>d56c <span style=color:#ae81ff>07</span> <span style=color:#ae81ff>8</span>a <span style=color:#ae81ff>84</span> ed 	vstr.32	s16,[r4,<span style=color:#75715e>#0x1c]</span>
+<span style=color:#ae81ff>0079</span>d570 <span style=color:#ae81ff>10</span> fa f1 ee 	vmrs   	pc,fpscr
+<span style=color:#ae81ff>0079</span>d574 <span style=color:#ae81ff>01</span> <span style=color:#ae81ff>00</span> a0 <span style=color:#ae81ff>93</span> 	movls  	r0,<span style=color:#75715e>#0x1</span>
+<span style=color:#ae81ff>0079</span>d578 <span style=color:#ae81ff>28</span> <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>84</span> <span style=color:#ae81ff>95</span> 	strls  	r0,[r4,<span style=color:#75715e>#0x28]</span>
+<span style=color:#ae81ff>0079</span>d57c bc <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>9</span>f e5 	ldr    	r0,[DAT_0079d640]
+;; Math.Roundを使ってる感
+<span style=color:#ae81ff>0079</span>d580 <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>9</span>f e7 	ldr    	r0,[pc,r0]<span style=color:#f92672>=&gt;-&gt;</span>Class<span style=color:#f92672>$</span>System.Math
+<span style=color:#ae81ff>0079</span>d584 <span style=color:#ae81ff>14</span> <span style=color:#ae81ff>50</span> <span style=color:#ae81ff>94</span> e5 	ldr    	r5,[r4,<span style=color:#75715e>#0x14]</span>
+<span style=color:#ae81ff>0079</span>d588 <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>90</span> e5 	ldr    	r0,[r0,<span style=color:#75715e>#0x0]=&gt;Class$System.Math</span>
+<span style=color:#ae81ff>0079</span>d58c bb <span style=color:#ae81ff>10</span> d0 e5 	ldrb   	r1,[r0,<span style=color:#75715e>#0xbb]</span>
+<span style=color:#ae81ff>0079</span>d590 <span style=color:#ae81ff>02</span> <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>11</span> e3 	tst    	r1,<span style=color:#75715e>#0x2</span>
+<span style=color:#ae81ff>0079</span>d594 <span style=color:#ae81ff>03</span> <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>0</span>a 	beq    	LAB_0079d5a8
+<span style=color:#ae81ff>0079</span>d598 <span style=color:#ae81ff>74</span> <span style=color:#ae81ff>10</span> <span style=color:#ae81ff>90</span> e5 	ldr    	r1,[r0,<span style=color:#75715e>#0x74]</span>
+<span style=color:#ae81ff>0079</span>d59c <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>51</span> e3 	cmp    	r1,<span style=color:#75715e>#0x0</span>
+<span style=color:#ae81ff>0079</span>d5a0 <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>1</span>a 	bne    	LAB_0079d5a8
+<span style=color:#ae81ff>0079</span>d5a4 <span style=color:#ae81ff>4</span>a c1 e8 eb 	bl     	thunk_FUN_001817d8        	 
+                 	LAB_0079d5a8                             	 
+<span style=color:#ae81ff>0079</span>d5a8 c8 <span style=color:#ae81ff>0</span>a f7 ee 	vcvt.f64   d16,s16
+<span style=color:#ae81ff>0079</span>d5ac <span style=color:#ae81ff>01</span> <span style=color:#ae81ff>20</span> a0 e3 	mov    	r2,<span style=color:#75715e>#0x1</span>
+<span style=color:#ae81ff>0079</span>d5b0 <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>30</span> a0 e3 	mov    	r3,<span style=color:#75715e>#0x0</span>
+<span style=color:#ae81ff>0079</span>d5b4 <span style=color:#ae81ff>30</span> <span style=color:#ae81ff>0</span>b <span style=color:#ae81ff>51</span> ec 	vmov   	r0,r1,d16
+<span style=color:#ae81ff>0079</span>d5b8 <span style=color:#ae81ff>05</span> bc ec eb 	bl     	System.Math<span style=color:#f92672>$$</span>Round      
+</code></pre></div><p>大まかに処理にあたりをつけ、<code>state = GameState.Finish;</code>っぽいところを抜き出すと以下になる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-s data-lang=s>;; r0レジスタに<span style=color:#75715e>#0x01を書き込む</span>
+<span style=color:#ae81ff>0079</span>d574 <span style=color:#ae81ff>01</span> <span style=color:#ae81ff>00</span> a0 <span style=color:#ae81ff>93</span> 	movls  	r0,<span style=color:#75715e>#0x1</span>
+;; r0の値をメモリのr4 <span style=color:#f92672>+</span> <span style=color:#75715e>#0x28のアドレスに書き込む</span>
+<span style=color:#ae81ff>0079</span>d578 <span style=color:#ae81ff>28</span> <span style=color:#ae81ff>00</span> <span style=color:#ae81ff>84</span> <span style=color:#ae81ff>95</span> 	strls  	r0,[r4,<span style=color:#75715e>#0x28]</span>
+</code></pre></div><p>命令の後ろについている<code>ls</code>は命令実行と同時にフラグレジスタを制御するsuffixなので無視して大丈夫。
+<a href="http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0204j/Cihcdbca.html">mov</a>はレジスタに値を書き込む命令で、<a href="http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/BABFGBDD.html">str</a>はメモリに値を書き込むストア命令。</p><p>どうやら、<code>0079d578番地</code>でメモリに書き込み、メモリに書き込む値は<code>0079d574番地</code>で指定されており、それは<code>0x01</code>らしい。</p><p>mono scripting backendの時と同様に、<code>GameState::FinishをGameState::Playing</code> に置き換えれば無限にスコアを稼げるチートができるので、<code>0079d574番地</code>の命令を以下に置き換えてみる。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-s data-lang=s><span style=color:#ae81ff>01</span> <span style=color:#ae81ff>00</span> a0 <span style=color:#ae81ff>93</span>     movls      r0,<span style=color:#75715e>#0x1</span>
+↓
+<span style=color:#ae81ff>00</span> <span style=color:#ae81ff>00</span> a0 <span style=color:#ae81ff>93</span>     movls      r0,<span style=color:#75715e>#0x0</span>
+</code></pre></div><p>armv7は<a href=https://en.wikipedia.org/wiki/ARM_architecture>リトルエンディアンっぽい(little as default)</a>ので機械語コードの先頭部分がオペランドになる。</p><p><code>01</code>が<code>0x01</code>なのでこれを<code>00</code>にする。</p><p>Ghidra力が足りなくてGhidraでのアセンブリ書き換えがなぜかうまくいかなかったので今回は普通にバイナリエディタで書き換えてみた。</p><p>Windowsで有名なバイナリエディタであるStrlingでlibil2cpp.soを開く。</p><p><img src=./img/strling.png alt></p><p>検索 > 指定アドレスへ移動で書き換えたいmov命令がある<code>0079d574</code>まで移動するが、ここで注意しなければいけないのはGhidraは<code>Image Baseありのアドレス</code>で表示していることだ。</p><p>Image Baseとは機械語コードがメモリにロードされたときのOffsetのようなものだが、GhidraのMemory Mapを見るとImage Baseが<code>00010000</code>となっていることがわかる。</p><p><img src=./img/imagebase.png alt></p><p>のでGhidraはこのオフセット分加算されたアドレスが表示されている。</p><p>実際のアドレスは
+<code>0079d574</code>から<code>10000</code>を引いた<code>0078d574</code>
+となる。</p><p>このアドレスをStrlingで開いてみる。</p><p><img src=./img/strling-write-before.png alt></p><p><code>01 00 A0 93</code> を見つけた。</p><p>これを<code>00 00 A0 93</code>に書き換える。</p><p><img src=./img/strling-write-after.png alt></p><p>書き換えたらlibil2cppに上書き保存する。</p><h3 id=改ざんしたapkで遊ぶ>改ざんしたapkで遊ぶ</h3><p>これで改ざんが完了してたので同様に、apk再構築、再署名、再インストールを行う。</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#75715e># apk再構築</span>
+$ java -jar apktool.jar build -f base/
+<span style=color:#75715e># 再署名</span>
+$ jarsigner -keystore test-keystore base/dist/base.apk mykey
+<span style=color:#75715e># アンインストール</span>
+$ adb uninstall com.garicchi.plumber
+<span style=color:#75715e># インストール</span>
+$ adb install base/dist/base.apk
+</code></pre></div><p>残り時間が0になってもゲームが終了しないので無限にスコアを稼げるようになった。</p><p><img src=./img/play-overtime.png alt></p><p>このように、IL2CPP化したバイナリであっても、解析が可能となる。</p><p>対策としては、バイナリ難読化などが有効となる。</p><h2 id=動的解析によるメモリ改ざん>動的解析によるメモリ改ざん</h2><p>今までのチート手法はapkを解析する静的解析だったが、よく用いられるチート手法として、メモリ改ざんのような動的解析がある。</p><p>メモリ改ざんは、Android上でアプリを起動し、そのアプリのメモリの変化を観察し、チートしたいメモリを特定、そしてメモリを書き換えることによりチートを行う。</p><p>Android上でメモリ改ざんもやりたかったのですが、root化したandroidを用意しなければいけないなどハードルが高かったので今回はUnityでWindowsゲームとしてビルドし、Windowsゲームのメモリ改ざんを行ってみる。</p><p>多少ツールは違うが、基本的な考え方はAndroidもWindowsも同じなはずである。</p><p>Windowsプログラムのメモリ改ざんを行うには、<a href=https://www.vector.co.jp/soft/win95/prog/se375830.html>うさみみハリケーン</a>などのプロセスメモリエディタを使います。
+Androidの同様なツールとしては、<a href=https://gameguardian.net/>GameGurdian</a>などがあります。</p><h3 id=動的にメモリを書き換える>動的にメモリを書き換える</h3><p>UnityでWindows向けにゲームをビルドしたら、exeを起動し、うさみみハリケーンでアタッチする。</p><p><img src=./img/atach-process.png alt></p><p>ゲーム画面で、ATTACKボタンを数回押してスコアを20にしておく。</p><p><img src=./img/score-20.png alt></p><p>うさみみハリケーンで <code>検索 > メモリ範囲を指定して検索</code>を押す。
+検索ボックスに現在のスコア値である<code>20</code>を入力し、検索を行う。</p><p><img src=./img/search-memory-20.png alt></p><p>右側に<code>20</code>という値を持っているメモリ一覧がでてくる。
+しかし20の値を持つメモリはたくさん存在し、どのメモリが改ざんしたいスコアのメモリかわからない。</p><p>そこでさらにATTACKボタンを押して、スコアを<code>50</code>まで進める。</p><p><img src=./img/score-50.png alt></p><p>その後、もう一度範囲検索のウインドウに戻り、今度は<code>50</code>を入力して検索を行う。</p><p><img src=./img/search-memory-50.png alt></p><p>すると、前回検索時の値が20で、今回検索時に値が50になったメモリが列挙される。</p><p>結果、スコアを保存しているメモリは <code>027E2BC9149C</code>であることがわかった。</p><p>あとはメモリの<code>027E2BC9149C</code>番地の値を書き換えるだけ。テキトーにFを押して書き換えてみる。</p><p><img src=./img/write-memory.gif alt></p><p>スコアの値を改ざんし、非常に高いスコアを記録することができた。</p><p>Androidの場合も、root化は必須ではあるが、同じような方法で改ざんを行うことができる。</p><p>対策としては、大半ののプロセスメモリエディタはroot化をしないと他のプロセスをみることができないため、root化を検知してroot化されていた場合はアプリの起動を抑止するなどがある。</p><p>また、表示されている値とメモリに入っている値をXORなどで変換するなども有効である。</p><h2 id=参考資料>参考資料</h2><ul><li><a href=https://stackoverflow.com/questions/1043322/why-do-i-get-access-denied-to-data-folder-when-using-adb>Why do I get access denied to data folder when using adb? - StackOverflow</a></li><li><a href=https://engineering.linecorp.com/ja/blog/unity-from-a-security-engineer-point-of-view/>セキュリティエンジニアからみたUnityのこと - LINE Enginner Blog</a></li><li><a href=https://gamedev.stackexchange.com/questions/140493/difference-between-unity-scripting-backend-il2cpp-and-mono2x>Difference between unity scripting backend IL2CPP and Mono2x</a></li><li><a href="https://speakerdeck.com/st98/seccon-2018-x-cedec-challenge-gemusekiyuriteitiyarenzi-harekaze?slide=22">SECCON 2018 x CEDEC CHALLENGE ゲームセキュリティチャレンジ - Harekaze - SpeakerDeck</a></li><li><a href=https://www.slideshare.net/dena_tech/dena-techcon-2019-132194701>スマホゲームのチート手法とその対策 [DeNA TechCon 2019]</a></li><li><a href=https://book.impress.co.jp/books/1113101030>リバースエンジニアリングバイブル - インプレスブック</a></li><li><a href=https://gihyo.jp/book/2013/978-4-7741-5918-8>たのしいバイナリの歩き方 - 技術評論社</a></li></ul></div></article></main><aside><div><div><h3>LATEST POSTS</h3></div><div><ul><li><a href=/posts/20200920-unity-android-cheat/>Unity製Androidゲームの解析と改ざん</a></li></ul></div></div></aside><style>#share-buttons{display:inline-block;vertical-align:middle}#share-buttons:after{content:"";display:block;clear:both}#share-buttons>div{position:relative;text-align:left;height:36px;width:32px;float:left;text-align:center}#share-buttons>div>svg{height:16px;fill:#d5d5d5;margin-top:10px}#share-buttons>div:hover{cursor:pointer}#share-buttons>div.facebook:hover>svg{fill:#3b5998}#share-buttons>div.twitter:hover>svg{fill:#55acee}#share-buttons>div.linkedin:hover>svg{fill:#0077b5}#share-buttons>div.pinterest:hover>svg{fill:#cb2027}#share-buttons>div.gplus:hover>svg{fill:#dd4b39}#share-buttons>div.mail:hover>svg{fill:#7d7d7d}#share-buttons>div.instagram:hover>svg{fill:#c73b92}#share-buttons>div.facebook>svg{height:18px;margin-top:9px}#share-buttons>div.twitter>svg{height:20px;margin-top:8px}#share-buttons>div.linkedin>svg{height:19px;margin-top:7px}#share-buttons>div.pinterest>svg{height:20px;margin-top:9px}#share-buttons>div.gplus>svg{height:17px;margin-top:9px;position:relative;left:1px}#share-buttons>div.mail>svg{height:14px;margin-top:11px}</style><span style=color:silver>Share on:</span><div id=share-buttons><div class=facebook title="Share this on Facebook" onclick="window.open('http://www.facebook.com/share.php?u=https:\/\/garicchi.github.io\/posts\/20200920-unity-android-cheat\/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1343 12v264h-157q-86 0-116 36t-30 108v189h293l-39 296h-254v759H734V905H479V609h255V391q0-186 104-288.5T1115 0q147 0 228 12z"/></svg></div><div class=twitter title="Share this on Twitter" onclick="window.open('http://twitter.com/home?status=https:\/\/garicchi.github.io\/posts\/20200920-unity-android-cheat\/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1684 408q-67 98-162 167 1 14 1 42 0 130-38 259.5T1369.5 1125 1185 1335.5t-258 146-323 54.5q-271 0-496-145 35 4 78 4 225 0 401-138-105-2-188-64.5T285 1033q33 5 61 5 43 0 85-11-112-23-185.5-111.5T172 710v-4q68 38 146 41-66-44-105-115t-39-154q0-88 44-163 121 149 294.5 238.5T884 653q-8-38-8-74 0-134 94.5-228.5T1199 256q140 0 236 102 109-21 205-78-37 115-142 178 93-10 186-50z"/></svg></div><div class=linkedin title="Share this on Linkedin" onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=https:\/\/garicchi.github.io\/posts\/20200920-unity-android-cheat\/&title=&summary=&source=');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M477 625v991H147V625h330zm21-306q1 73-50.5 122T312 490h-2q-82 0-132-49t-50-122q0-74 51.5-122.5T314 148t133 48.5T498 319zm1166 729v568h-329v-530q0-105-40.5-164.5T1168 862q-63 0-105.5 34.5T999 982q-11 30-11 81v553H659q2-399 2-647t-1-296l-1-48h329v144h-2q20-32 41-56t56.5-52 87-43.5T1285 602q171 0 275 113.5t104 332.5z"/></svg></div><div class=gplus title="Share this on Google Plus" onclick="window.open('https://plus.google.com/share?url=https:\/\/garicchi.github.io\/posts\/20200920-unity-android-cheat\/');"><svg viewBox="0 0 2304 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1437 913q0 208-87 370.5t-248 254-369 91.5q-149 0-285-58t-234-156-156-234T0 896t58-285 156-234 234-156 285-58q286 0 491 192l-199 191Q908 433 733 433q-123 0-227.5 62T340 663.5 279 896t61 232.5T505.5 1297t227.5 62q83 0 152.5-23t114.5-57.5 78.5-78.5 49-83 21.5-74H733V791h692q12 63 12 122zm867-122v210h-209v209h-210v-209h-209V791h209V582h210v209h209z"/></svg></div><div class=mail title="Share this through Email" onclick="window.open('mailto:?&body=https:\/\/garicchi.github.io\/posts\/20200920-unity-android-cheat\/');"><svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1792 710v794q0 66-47 113t-113 47H160q-66 0-113-47T0 1504V710q44 49 101 87 362 246 497 345 57 42 92.5 65.5t94.5 48 110 24.5h2q51 0 110-24.5t94.5-48 92.5-65.5q170-123 498-345 57-39 1e2-87zm0-294q0 79-49 151t-122 123q-376 261-468 325-10 7-42.5 30.5t-54 38-52 32.5-57.5 27-50 9h-2q-23 0-50-9t-57.5-27-52-32.5-54-38T639 1015q-91-64-262-182.5T172 690q-62-42-117-115.5T0 438q0-78 41.5-130T160 256h1472q65 0 112.5 47t47.5 113z"/></svg></div></div><footer><p>&copy; 2020 <a href=https://garicchi.github.io/><b>garicchi.github.io</b></a>.</p></footer></body></html>
