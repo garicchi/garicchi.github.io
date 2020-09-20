@@ -1,0 +1,8 @@
+baseURL = "https://garicchi.github.io/"
+languageCode = "ja-jp"
+title = "garicchi.github.io"
+theme = "smol"
+
+[outputs]
+  home = ["HTML", "RSS", "Sitemap"]
+  page = ["HTML"]
