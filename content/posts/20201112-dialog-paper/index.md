@@ -1,7 +1,7 @@
 ---
 title: "2020/11/12 Dialog Paper Survey"
 date: 2020-11-12T19:33:05+09:00
-draft: true
+draft: false
 ---
 
 なんか久しぶりに研究をしたくなってきた。
