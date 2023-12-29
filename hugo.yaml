@@ -1,0 +1,22 @@
+baseURL: 'https://garicchi.github.io/blog'
+languageCode: 'ja-jp'
+title: 'garicchi.github.io/blog'
+theme: 'smol'
+
+# Header
+menus:
+  main:
+    - identifier: 'top'
+      name: 'top'
+      url: '/'
+      weight: 1
+    - identifier: 'posts'
+      name: 'posts'
+      url: '/posts/'
+    - identifier: 'categories'
+      name: 'categories'
+      url: '/categories/'
+    - identifier: 'profile'
+      name: 'profile'
+      url: 'https://github.com/garicchi'
+      wight: 1000
