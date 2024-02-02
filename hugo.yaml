@@ -1,6 +1,6 @@
-baseURL: 'https://garicchi.github.io/blog'
+baseURL: 'https://blog.garicchi.me'
 languageCode: 'ja-jp'
-title: 'garicchi.github.io/blog'
+title: 'blog.garicchi.me'
 theme: 'smol'
 
 # Header
