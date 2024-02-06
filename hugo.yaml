@@ -3,6 +3,9 @@ languageCode: 'ja-jp'
 title: 'blog.garicchi.me'
 theme: 'smol'
 
+params:
+  description: true
+
 # Header
 menus:
   main:
