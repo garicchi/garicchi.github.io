@@ -3,7 +3,7 @@ title: "在宅ワーカー、不眠症と戦う (2024年令和最新版)"
 date: 2024-03-11T07:25:05+09:00
 slug: 2024-03-11-insomnia
 type: posts
-draft: true
+draft: false
 categories:
   - life
 tags:
