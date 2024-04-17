@@ -3,7 +3,7 @@ title: "WSLでVPNに接続したとき、MTUを自動で切り替える"
 date: 2024-04-17T14:05:27+09:00
 slug: 2024-04-17-wsl-vpn
 type: posts
-draft: true
+draft: false
 categories:
   - default
 tags:
