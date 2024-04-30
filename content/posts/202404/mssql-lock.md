@@ -1,5 +1,5 @@
 ---
-title: "Azure SQL Databaseで行ロックの挙動を調べてみる"
+title: "SQL ServerとPostgreSQLで行ロックの挙動を調べてみる"
 date: 2024-04-26T09:07:30+09:00
 slug: 2024-04-26-mssql-lock
 type: posts
@@ -9,10 +9,11 @@ categories:
 tags:
   - azure
   - mssql
+  - postgresql
 ---
 
-Azure SQL DatabaseやSQL Serverを利用したシステムを作るとき、
-同じレコードを複数のプロセスが同時に更新しようとしたとき、
+DBMSを利用したシステムを作っていると、
+同じレコードを複数のシステムが同時に更新しようとしたとき、
 うまく排他制御や競合解決をしなければ更新データが紛失する可能性があります。
 
 例えば2つのアプリから同時に1つのレコードにある値をインクリメントしたい場合、
@@ -25,12 +26,8 @@ Amountの初期値が0であれば、2つのアプリから1回ずつインク�
 在庫数が最後の1個で、複数のユーザーが同時に同じ商品を購入したとき、
 在庫数が足りないにもかかわらず、両方のユーザーが注文できてしまうことになります。
 
-こういうことを防止するために、DBMSには排他制御や競合解決という概念があって、
-MySQLやPostgresなどでは、 `更新ロック(select for update)` で防ぐことが一般的かと思います。
-
-一方、Azure SQL DatabaseやSQL Serverでは `select for update` の構文は直接的には存在せず、
-トランザクションを貼れば行がロックされる というような情報があったり、
-何が正しいのかよくわからなかったので、挙動を調査してみます。
+こういうことを防止するために、DBMSには排他制御や競合解決という概念がありますが、
+DBMSによって挙動が異なったり、結構理解していないところがあったので、挙動を調査してみます。
 
 ## ロック挙動の調べ方
 
@@ -38,6 +35,7 @@ MySQLやPostgresなどでは、 `更新ロック(select for update)` で防ぐ�
 などを実現する必要があります。
 
 まず、テーブルを作ります。
+下記ではSQL Serverを例として示します。
 
 ```sql
 create table dbo.Items
@@ -49,145 +47,133 @@ create table dbo.Items
 
 そして、下記のことができるdotnetのconsoleアプリを作ってターミナルを2つ同時に立ち上げて
 確認することとします。
+DBMSとの接続はEntity Framework Coreを使用することとします。
 
 - トランザクションの開始 (DatabaseFacade.BeginTransactionAsyncを使用)
 - selectクエリで行取得
-- ロック情報の表示
 - Amount++
-- updateクエリ発行
-- ロック情報の表示
+- updateクエリで行更新
 - commit
 
-SQL Serverでロック情報は、下記sqlで表示できました。
+↑を2つのターミナル(tx1、tx2とする)から同時に実行
 
-```sql
-SELECT resource_type, request_mode
-FROM sys.dm_tran_locks
-where resource_database_id = DB_ID('{db name}')
-and resource_description <> ''
-```
+- Amountの更新が消失していないか調査
+  - 正しく排他制御ができているならAmount = 2になるはず
 
 各ランタイムやパッケージのバージョンは以下です。
 
 - dotnet core: 8.0.4
-- EntityFrameworkCore: 9.0.0-preview.3.24172.4
+- EntityFrameworkCore: 8.0.4
+- SQL Server: 2019
+- PostgreSQL: 16
 
-## Read Commited Snapshotの場合
-まず、トランザクション分離レベルがRead Commited Snapshotの場合の挙動を調べます。
-Read Commited SnapshotはAzure SQL DatabaseやSQL Serverのデフォルトの分離レベルなので、
-何も設定をいじらず、 `DatabaseFacade.BeginTransactionAsync` を使用してトランザクションを貼った場合は
-Read Commited Snapshotになるかと思います。
+なお、トランザクション分離レベルについては、Read CommittedとSerialziedについて調査することとします。
 
-### ロックの挙動の確認
-まずは各クエリ発行前に、ロックがどのような状態になるのかを調査しました。
+## SQL Server、Read Committed、tx2がtx1のupdateよりも前にselectする場合
 
-```
-[LOCK INFO BEFORE SELECT]: []
-ここでSelect
-[READ DATA BEFORE UPDATE]: {"Id":1,"Amount":0}
-[LOCK INFO BEFORE UPDATE]: []
-ここでUpdate
-[LOCK INFO BEFORE COMMIT]: [{"resource_type":"XACT","request_mode":"X"}]
-ここでCommit
-[LOCK INFO AFTER COMMIT]: []
-[READ DATA AFTER COMMIT]: {"Id":1,"Amount":1}
-```
+DBMSはSQL Server、Isolation LevelはRead Committedで、
+tx1がselectした後、updateをする前にtx2がselectした場合の挙動を確認してみます。
 
-このことから、Read Commited Snapshotでは下記のロック挙動があることがわかります。
+なぜRead Committedかというと、SQL Serverのデフォルトのトランザクション分離レベルだからです。
 
-- Selectでは何もロックをしない
-- Updateを発行すると、Xロックを取る
-- Commitをするとロックが解放される
+![alt](../img/readcommited_select_q.png)
 
-#### db_tran_locks.request_modeについて
+- tx1がselect、tx2がselectをし、成功する
+  - tx1、tx2が共有ロックをとる
+  - tx2のselectはブロックされない
+- tx1がupdateをすると排他ロックをとる
+- tx1が排他ロックをとると、tx2がupdateをしてもブロックされる
+- tx1がcommitをすると、tx1の排他ロックは解除され、tx2が排他ロックを取得し、updateクエリを発行できる
+- tx2がcommitをすることができる
+- 最終的にAmount = 1となり、tx1の更新がtx2に上書きされ、消失した
 
-上記のrequest_modeでは `X` という表示がありますが、これがロックの種類です。
-[こちらの記事](https://atmarkit.itmedia.co.jp/fdotnet/entwebapp/entwebapp09/entwebapp09_01.html)がわかりやすいので
-少し抜粋します
+ということで、この条件の場合、2つのトランザクションが同時に発行されると、更新が消失する可能性があることがわかりました。
 
-- S: 共有ロック
-  - 他のトランザクションに、データを読み出し中であることを知らせる
-- X: 排他ロック
-  - 他のトランザクションに、データを更新中であることを知らせる
-  - Xをとっているときは、
+## SQL Server、Read Committed、tx2がtx1のupdateより後にselectする場合
 
-### 競合解決の挙動の確認
-次に、Read Commited Snapshotで、2つのトランザクションから同時に同じ行をselectし、更新してみます。
-
-すべて、Amount = 0から初めて、2つのトランザクションから同時にインクリメントを行うので、Amount = 2となれば
-正しく競合解決ができていることになります。
-
-#### tx2がtx1のupdateより先にselectを行った場合
-tx2は下図のように、tx1のupdateより前でselectを行うこととします
-
-![alt](..//img/readcommited_select_q.png)
-
-tx1
-```
-[LOCK INFO BEFORE SELECT]: []
-ここでselect
-[LOCK INFO AFTER SELECT]: []
-[READ DATA BEFORE UPDATE]: {"Id":1,"Amount":0}
-[LOCK INFO BEFORE UPDATE]: []
-ここでupdate
-[LOCK INFO AFTER UPDATE]: [{"resource_type":"XACT","request_mode":"X","request_owner_id":198654}]
-[LOCK INFO BEFORE COMMIT]: [{"resource_type":"XACT","request_mode":"X","request_owner_id":198654},{"resource_type":"XACT","request_mode":"S","request_owner_id":198683}]
-ここでcommit
-[LOCK INFO AFTER COMMIT]: [{"resource_type":"XACT","request_mode":"X","request_owner_id":198683}]
-[READ DATA AFTER COMMIT]: {"Id":1,"Amount":1}
-```
-
-tx2
-```
-[LOCK INFO BEFORE SELECT]: []
-ここでselect
-[LOCK INFO AFTER SELECT]: []
-[READ DATA BEFORE UPDATE]: {"Id":1,"Amount":0}
-[LOCK INFO BEFORE UPDATE]: [{"resource_type":"XACT","request_mode":"X","request_owner_id":198654}]
-ここでtx1がcommit終わるまでロック待ちが発生
-ここでupdate
-[LOCK INFO AFTER UPDATE]: [{"resource_type":"XACT","request_mode":"X","request_owner_id":198683}]
-[LOCK INFO BEFORE COMMIT]: [{"resource_type":"XACT","request_mode":"X","request_owner_id":198683}]
-ここでcommit
-[LOCK INFO AFTER COMMIT]: []
-[READ DATA AFTER COMMIT]: {"Id":1,"Amount":1}
-```
-
-結果、以下のようなことがわかりました
-
-- tx2はtx1がupdateする前であればselectができる
-- tx2はtx1がupdateをした(Xロックを取った)あとでupdateしようとすれば、ロック待ちが発生する
-- tx1がcommitを行えば、ロックが解放され、tx2がXロックを取得でき、updateを行える
-- 最終的なamount = 1となり、tx1の更新した増加分が消失している
-
-ということで、Read Commited Snapshotでtx2がtx1のupdate前にselectを行った場合、
-最終結果は意図しないものになってしまうということがわかりました。
-
-#### tx2がtx1のupdateより後にselectを行った場合
-
-次に、tx2がtx1のupdateより後でselectを行った場合の挙動を見てみます
+次にtx1がselectした後、updateをした後にtx2がselectした場合の挙動を確認してみます。
 
 ![alt](../img/readcommited_update_q.png)
 
-結果、Amount = 1となり、こちらもtx1の更新分が消失してしまいました
+- tx1がselect、updateをし、排他ロックをとる
+- tx2がselectをしようとして、ブロックされる
+- tx1がcommitをすると、tx1の排他ロックが解除され、tx2のselectが動き始める
+- tx2がupdateとcommitをすることができる
+- 最終的にAmount = 2となり、正しく排他制御ができた
 
-## Serializedの場合
-分離レベルがSerializedの場合はどうなるでしょうか
+ということで、この条件の場合、2つのトランザクションが同時に発行されると、更新が消失しないことがわかりました。
 
-### ロックの挙動の確認
+## SQL Server、Serialized、tx2がtx1のupdateよりも前にselectする場合
 
+つづいて、IsolationLevelをSerializedにした場合の挙動を見てみます。
+なぜSerializedを見るかというと、[System.Transactions.TransactionScope](https://learn.microsoft.com/ja-jp/dotnet/api/system.transactions.transactionscope) のデフォルト分離レベルであり、TransactionScopeをデフォルトのまま使用しているときの挙動を確認できるからです。
+
+- tx1がselect、tx2がselectをし、成功する
+  - tx1、tx2が共有ロックをとる
+  - tx2のselectはブロックされない
+- tx1がupdateをしようとするが共有ロックがとられていて排他ロックをとれず、updateがブロックされる
+- tx2がudpateをしようとすると、共有ロックがとられていて排他ロックをとれず、updateがブロックされる
+- ここでDBMSによってデッドロックが検知され、tx2がエラーになる
+- tx1は排他ロックをとることに成功し、commitできる
+- 最終的にAmount = 1となり、tx1の更新だけ通り、tx2はデッドロックエラーになる
+
+ということで、この条件では、デッドロックとなり、tx2だけエラーになりました。
+
+MS公式ドキュメントを読むと、updateをするときに、共有ロックを排他ロックに変換するが、その時すでにほかのトランザクションから共有ロックがとられている場合、ブロックされるらしく、それと同じ挙動を確認できました。
+
+> REPEATABLE READ または SERIALIZABLE のトランザクションは、データを読み取るときにリソースに共有 (S) ロックをかけます。その後、行を変更しますが、そのときにロックを排他 (X) ロックに変換する必要があります。 2 つのトランザクションが 1 つのリソースに対して共有 (S) ロックをかけデータを同時に更新する場合、一方のトランザクションは排他 (X) ロックへの変換を試みます。 一方のトランザクションの排他ロックは、もう一方のトランザクションの共有 (S) ロックとは両立しないので、共有ロックから排他ロックへの変換が待機状態になります。つまり、ロック待機となります。 もう一方のトランザクションも更新のために排他 (X) ロックの取得を試みます。 この場合、2 つのトランザクションが排他 (X) ロックへの変換を行っており、相手方のトランザクションが共有 (S) ロックを解除するのを待っている状態なので、デッドロックが発生します。
+https://learn.microsoft.com/ja-jp/sql/relational-databases/sql-server-transaction-locking-and-row-versioning-guide?view=sql-server-ver16#update
+
+## SQL Server、Serialized、tx2がtx1のupdateよりも後にselectする場合
+
+続いて、同じようにtx2が後でselectをした場合の挙動を確認します。
+
+- tx1はselectで共有ロックをとり、updateで排他ロックに変換する
+- その後tx2がselectをしようとしても、排他ロックがとられているのでブロックされる
+- tx1のcommitが成功すると、tx2のブロックが解除され、selectが動き出す
+- tx2のcommitが通る
+- 最終的にAmount = 2となり、正しく排他制御ができていることがわかる
+
+ということで、この条件の場合、2つのトランザクションが同時に発行されると、更新が消失しないことがわかりました。
+
+## SQL Serverの挙動まとめ
+
+ここまでの挙動をまとめると、下記になります。
+
+|分離レベル|tx2がいつselectを行うか|結果|
+|:---:|:---:|:---:|
+|Read Committed|tx1のupdateより前|更新が消失する可能性あり|
+|Read Committed|tx1のupdateより後|正しく更新できる|
+|Serialized|tx1のupdateより前|tx2がデッドロックエラー|
+|Serialzied|tx1のupdateより後|正しく更新できる|
+
+SQL Serverを使用したシステムを使用されている方は、おそらく分離レベル=ReadCommittedを使用されている場合が多いかと思いますし、TransactionScopeを使用されている方は分離レベル=Serializedを使用されている方が多いかと思います。
+
+そしてほとんどの場合において、tx2のselectがtx1のupdateより後になることを保証していることはないかと思います。
+
+したがって、SQL Serverを使用されている方は、更新がデフォルトのまま使っていると、更新が消失する可能性があるということに留意する必要があるかと考えます。
+(※楽観排他制御をしない場合)
+
+## SQL Serverで更新の消失を防ぐ
+ではどのようにすれば更新の消失が防げるかというと、selectした行はcommitするまで他のトランザクションからselectできなくすればよいです。
+これを更新ロックと呼び、MySQLやPostgreSQLでは `select for update` のようなSQLで実現できます。
+
+ただSQL Serverには `select for update` はなく、[クエリヒント](https://learn.microsoft.com/ja-jp/sql/t-sql/queries/hints-transact-sql-query?view=sql-server-ver15)で更新ロックを実現します。
+
+下記のような感じで `with(UPDLOCK)` を書きます
+
+```sql
+select * from Items with(UPDLOCK) where Id = 1
 ```
-[LOCK INFO BEFORE SELECT]: []
-ここでselect
-[LOCK INFO AFTER SELECT]: [{"resource_type":"KEY","request_mode":"S","request_owner_id":226688},{"resource_type":"PAGE",
-"request_mode":"IS","request_owner_id":226688}]
-[READ DATA BEFORE UPDATE]: {"Id":1,"Amount":0}
-[LOCK INFO BEFORE UPDATE]: [{"resource_type":"KEY","request_mode":"S","request_owner_id":226688},{"resource_type":"PAGE","request_mode":"IS","request_owner_id":226688}]
-ここでupdate
-[LOCK INFO AFTER UPDATE]: [{"resource_type":"KEY","request_mode":"X","request_owner_id":226688},{"resource_type":"XACT","request_mode":"X","request_owner_id":226688},{"resource_type":"PAGE","request_mode":"IX","request_owner_id":226688}]
-[BEFORE COMMIT] waiting for any key...
-[LOCK INFO BEFORE COMMIT]: [{"resource_type":"KEY","request_mode":"X","request_owner_id":226688},{"resource_type":"XACT","request_mode":"X","request_owner_id":226688},{"resource_type":"PAGE","request_mode":"IX","request_owner_id":226688}]
-ここでcommit
-[LOCK INFO AFTER COMMIT]: []
-[READ DATA AFTER COMMIT]: {"Id":1,"Amount":1}
-```
+
+これで同じように実験をしてみると下記のような挙動になりました。
+
+- tx1がselectを行い、更新ロックを取得する
+- tx2がselectをしようとしたとき、更新ロックをとれず、ブロックされる
+- tx1がupdateで更新ロックを排他ロックに変換する
+- tx1がcommitしたら、排他ロックが解除され、tx2のselectが動き出す
+- tx2がupdate、commitできる
+- Amount = 2となり、正しい更新となる
+
+ということで、SQL Serverで悲観的排他制御をするのであれば、 `with(UPDLOCK)` を使用するのがよいかと思われます。
+
