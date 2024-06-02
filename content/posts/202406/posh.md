@@ -3,7 +3,7 @@ title: "Powershellを使いやすくしたい"
 date: 2024-06-02T15:16:01+09:00
 slug: 2024-06-02-posh
 type: posts
-draft: true
+draft: false
 categories:
   - computer
 tags:
