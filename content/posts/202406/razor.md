@@ -144,7 +144,13 @@ public record class RazorCompileResult
     }
 ```
 
-dynamic型を使用するので、 `dotnet add package Microsoft.Csharp` が必要です
+Rsolynとdynamic型を使用するので、下記パッケージが必要です
+
+```
+dotnet add package Microsoft.Csharp
+dotnet add package Microsoft.CodeAnalysis.Razor
+```
+
 あとはこれをこんな感じで呼び出せば、
 
 ```cs
