@@ -76,7 +76,7 @@ Directory Appにはユーザー割り当てのManaged IDを作り、App Service�
 
 次に、Directory Appに作ったアプリケーションを、Directory Resourceに所属させます。
 
-これは、サービスプリンシパルを作成することでDirectroy AppのアプリケーションをDirectroy Resourceに所属させることができます。
+これは、サービスプリンシパルを作成することでDirectory AppのアプリケーションをDirectory Resourceに所属させることができます。
 
 {{< details summary="Managed IDのアプリケーションIDをDirectory Resourceにサービスプリンシパルとして登録できないか？" >}}
 試したのですが、エラーになりました
@@ -84,7 +84,7 @@ Directory Appにはユーザー割り当てのManaged IDを作り、App Service�
 
 {{< details summary="アプリ登録をDirectory Resourceで行うことはできないか？" >}}
 アプリ登録をDirectory Appではなく、Directory Resourceですることは試したのですが、
-Directroy Appで発行されたmanaged id tokenをDirectroy Resourceのtokenへと変換することが出来ず、エラーになりました
+Directory Appで発行されたmanaged id tokenをDirectory Resourceのtokenへと変換することが出来ず、エラーになりました
 {{< /details >}}
 
 次に、Directory Resourceに所属させたサービルプリンシパルを、ストレージアカウントにロール割り当てします。
