@@ -1,0 +1,9 @@
+{
+	"name": "blog",
+	"build": {
+		"dockerfile": "../Dockerfile"
+	},
+	"forwardPorts": [
+		1313
+	]
+}
